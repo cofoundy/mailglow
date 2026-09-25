@@ -93,6 +93,21 @@ intercepts the send seam, and writes `<slug>.html` + `manifest.json` (subject, f
 Then: `$VE lint <dir>` → `$VE shoot <dir>` → **open the screenshots yourself** → `serve` for the user.
 Report per email: what it is, when it fires, its lint errors, and what looks wrong in dark/mobile.
 
+### Design quality gates (every round, before the user sees anything)
+
+- **Directions are worlds, not paints.** Round-1 variants must differ in STRUCTURE (information order, the one
+  gesture that owns the email, what is omitted). Anchor each on a concrete artefact from the reader's world
+  (a kitchen ticket, the chat itself, a bank alert). Judge a direction as a SYSTEM: the same direction applied to
+  2–3 emails of different urgency (alert, digest, transactional).
+- **The headline is the ask or the outcome**, in the customer's/reader's words — never the system event.
+- **Anti-slop pass**: strip every tell in `references/anti-slop.md` (eyebrows, "·" chains, "→", emoji icons,
+  pills, key/value rows, card-in-card, side-stripes, identical rows).
+- **Fresh critique before presenting**: a reviewer that did not design it scores the round (with the
+  Impeccable plugin: `/impeccable critique`; otherwise a fresh subagent with the anti-slop list + heuristics).
+  Fix P0/P1 first. Show the score with the work.
+- **Huecos in every round**: `$VE contract <slug>` per variant — existe / **deriva** (data exists, needs a rule or
+  endpoint) / falta (data doesn't exist) / sin origen — and say what each design would cost to build.
+
 ### C. Iterate (the loop)
 
 1. Put the current version in as variant `a` (`emails/<slug>/a.html`) so every round compares against it.

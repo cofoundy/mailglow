@@ -5,7 +5,11 @@
 //     "fields": {
 //       "contact.name":   { "status": "existe", "endpoint": "GET /conversations/{conversation_id}", "path": "contact.name" },
 //       "messages":       { "status": "existe", "endpoint": "GET /conversations/{conversation_id}/messages?limit=3", "path": "data" },
-//       "brief":          { "status": "falta",  "endpoint": "GET /conversations/{conversation_id}/brief", "note": "…", "sample": "…" } } }
+//       "brief":          { "status": "falta",  "endpoint": "GET /conversations/{conversation_id}/brief", "note": "…", "sample": "…" },
+//       "wait.label":     { "status": "deriva", "source": "conversations.last_customer_message_at", "endpoint": "GET /conversations/{id}/handoff", "note": "now − source, formatted" } } }
+//
+// status: existe (an endpoint returns it today) · deriva (the DATA exists — a table, a column, another endpoint —
+// but a rule or a new endpoint must expose it) · falta (the data does not exist anywhere yet) · anything else = sin origen.
 //
 // Syntax (mustache subset): {{x.y}} escaped · {{{x}}} raw · {{#list}}…{{/list}} loop / truthy block ·
 // {{^x}}…{{/x}} when empty · {{.}} current item · {{! comment }}.
@@ -62,12 +66,13 @@ export function fieldInfo(contract, key) {
 
 export function statusOf(contract, key) {
   const s = fieldInfo(contract, key).status;
-  return s === 'existe' || s === 'falta' ? s : 'sin';
+  return s === 'existe' || s === 'deriva' || s === 'falta' ? s : 'sin';
 }
 
 function label(contract, key) {
   const f = fieldInfo(contract, key);
   if (f.status === 'existe') return `existe · ${f.endpoint || '?'}${f.path ? ` → ${f.path}` : ''}  [${key}]`;
+  if (f.status === 'deriva') return `deriva · el dato existe${f.source ? ` (${f.source})` : ''}; falta exponerlo${f.endpoint ? ` en ${f.endpoint}` : ''}${f.note ? ` — ${f.note}` : ''}  [${key}]`;
   if (f.status === 'falta') return `falta · ${f.endpoint || 'endpoint por crear'}${f.note ? ` — ${f.note}` : ''}  [${key}]`;
   return `sin origen · ${key} no está en contract.json`;
 }
@@ -186,12 +191,12 @@ function finishMarks(html, contract, annotate) {
     return ` data-vf="${keys}" data-vf-kind="${kind === 'a' ? 'attr' : 'section'}" data-vf-status="${worst}" data-vf-label="${escapeAttr(lab)}"`;
   });
 }
-const rank = (s) => ({ sin: 0, falta: 1, existe: 2 })[s];
+const rank = (s) => ({ sin: 0, falta: 1, deriva: 2, existe: 3 })[s];
 
 function injectHuecosCss(html) {
   const css = `<style id="mailglow-huecos">
 [data-vf]{outline:1.5px dashed var(--vf,#16a34a)!important;outline-offset:2px;position:relative}
-.vf-existe,[data-vf-status=existe]{--vf:#16a34a}.vf-falta,[data-vf-status=falta]{--vf:#d97706}.vf-sin,[data-vf-status=sin]{--vf:#dc2626}
+.vf-existe,[data-vf-status=existe]{--vf:#16a34a}.vf-falta,[data-vf-status=falta]{--vf:#d97706}.vf-sin,[data-vf-status=sin]{--vf:#dc2626}.vf-deriva,[data-vf-status=deriva]{--vf:#2563eb}
 .vf-falta,[data-vf-status=falta]{background-image:repeating-linear-gradient(135deg,rgba(217,119,6,.10) 0 6px,transparent 6px 12px)!important}
 .vf-sin,[data-vf-status=sin]{background-image:repeating-linear-gradient(135deg,rgba(220,38,38,.12) 0 6px,transparent 6px 12px)!important}
 [data-vf]:hover{z-index:99}
@@ -211,18 +216,20 @@ export function contractReport(contract, variantFields) {
     for (const k of keys) {
       const info = fieldInfo(contract, k);
       const id = info.key;
-      rows[id] ||= { field: id, status: info.status === 'existe' || info.status === 'falta' ? info.status : 'sin', endpoint: info.endpoint || null, path: info.path || null, note: info.note || null, variants: [] };
+      rows[id] ||= { field: id, status: ['existe', 'deriva', 'falta'].includes(info.status) ? info.status : 'sin', source: info.source || null, endpoint: info.endpoint || null, path: info.path || null, note: info.note || null, variants: [] };
       if (!rows[id].variants.includes(v)) rows[id].variants.push(v);
     }
   }
   const fields = Object.values(rows).sort((a, b) => rank(a.status) - rank(b.status) || a.field.localeCompare(b.field));
   const perVariant = Object.fromEntries(Object.keys(variantFields).map((v) => {
     const mine = fields.filter((f) => f.variants.includes(v));
-    return [v, { existe: mine.filter((f) => f.status === 'existe').length, falta: mine.filter((f) => f.status === 'falta').length, sin: mine.filter((f) => f.status === 'sin').length }];
+    return [v, { existe: mine.filter((f) => f.status === 'existe').length, deriva: mine.filter((f) => f.status === 'deriva').length, falta: mine.filter((f) => f.status === 'falta').length, sin: mine.filter((f) => f.status === 'sin').length }];
   }));
   // A missing field on an existing endpoint is still work to build: name the endpoint AND the field.
-  const missingEndpoints = [...new Set(fields.filter((f) => f.status === 'falta').map((f) => (f.endpoint ? `${f.endpoint}${f.path ? ` → ${f.path}` : ''}` : `(${f.field})`)))];
-  return { fields, perVariant, missingEndpoints };
+  const toExpose = [...new Set(fields.filter((f) => f.status === 'deriva').map((f) => (f.endpoint ? `${f.endpoint}${f.path ? ` → ${f.path}` : ''}` : `(${f.field})`)))];
+  const missingData = fields.filter((f) => f.status === 'falta').map((f) => f.field);
+  const missingEndpoints = [...new Set(fields.filter((f) => f.status === 'falta' || f.status === 'deriva').map((f) => (f.endpoint ? `${f.endpoint}${f.path ? ` → ${f.path}` : ''}` : `(${f.field})`)))];
+  return { fields, perVariant, missingEndpoints, toExpose, missingData };
 }
 
 // Build a data case by calling the real endpoints the contract names (status "existe").

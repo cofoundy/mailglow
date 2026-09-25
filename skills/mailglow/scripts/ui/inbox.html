@@ -346,7 +346,8 @@ code{font-family:var(--mono);font-size:.92em}
 .hdots{display:none;gap:3px;margin-left:1px}
 .hdots i{width:6px;height:6px;border-radius:50%}
 #huecosSeg button[aria-pressed=true] .hdots{display:inline-flex}
-.hdots .ok,.d.ok{background:var(--ok)} .hdots .warn,.d.warn{background:var(--warn)} .hdots .err,.d.err{background:var(--err)}
+.hdots .ok,.d.ok{background:var(--ok)} .hdots .warn,.d.warn{background:var(--warn)}
+.d.info,.cbar i.info{background:var(--deriva,#2563eb)} .cst .info{color:var(--deriva,#2563eb)} .hdots .err,.d.err{background:var(--err)}
 .chips{display:flex;flex-wrap:wrap;gap:4px}
 .chip{display:inline-flex;align-items:center;gap:6px;max-width:100%;height:28px;padding:0 10px 0 4px;border-radius:999px;border:1px solid var(--line-2);background:transparent;color:var(--ink-2);font-weight:500;font-size:12px;transition:background .12s,color .12s,border-color .12s,box-shadow .12s}
 .chip:hover{color:var(--ink);border-color:var(--line)}
@@ -995,13 +996,13 @@ const MODES = [
 ];
 
 /* ── data contract: which fields each variant uses, and where each one comes from ── */
-const CS = { existe: 'ok', falta: 'warn', sin: 'err' };
+const CS = { existe: 'ok', deriva: 'info', falta: 'warn', sin: 'err' };
 const ep = (s) => { const [mt, ...rest] = String(s).split(' '); const path = rest.length ? rest.join(' ') : mt;
   return `${rest.length ? `<span class="mt">${esc(mt)}</span>` : ''}${path.split(/(\{[^}]+\})/).map((x, i) => (i % 2 ? `<span class="pm">${esc(x)}</span>` : esc(x).replace(/([/?]|&amp;|=)/g, '$1<wbr>'))).join('')}`; };
 function contractLine(m, key) {
   const c = m.contract?.perVariant?.[key]; if (!c) return '';
-  if (!c.falta && !c.sin) return `<span class="cst"><span class="ok">datos completos · ${c.existe}</span></span>`;
-  return `<span class="cst">${c.falta ? `<span class="warn">${c.falta} ${c.falta === 1 ? 'falta' : 'faltan'}</span>` : ''}${c.sin ? `<span class="err">${c.sin} sin origen</span>` : ''}</span>`;
+  if (!c.falta && !c.sin && !c.deriva) return `<span class="cst"><span class="ok">datos completos · ${c.existe}</span></span>`;
+  return `<span class="cst">${c.deriva ? `<span class="info">${c.deriva} por derivar</span>` : ''}${c.falta ? `<span class="warn">${c.falta} ${c.falta === 1 ? 'falta' : 'faltan'}</span>` : ''}${c.sin ? `<span class="err">${c.sin} sin origen</span>` : ''}</span>`;
 }
 function renderCases(m) {
   const cs = m.template ? m.cases : []; $('#caseSec').hidden = !m.template;
@@ -1015,15 +1016,15 @@ function renderCases(m) {
 function renderContract(m, v) {
   const rep = m.contract; $('#ctrSec').hidden = !rep;
   if (!rep) return;
-  const multi = m.variants.length > 1; const c = rep.perVariant[v.key] || { existe: 0, falta: 0, sin: 0 };
+  const multi = m.variants.length > 1; const c = rep.perVariant[v.key] || { existe: 0, deriva: 0, falta: 0, sin: 0 };
   $('#ctrFor').innerHTML = multi ? `<span class="tag">${esc(v.key)}</span>` : '';
   const mine = rep.fields.filter((f) => f.variants.includes(v.key));
-  const falta = mine.filter((f) => f.status === 'falta'); const sin = mine.filter((f) => f.status === 'sin');
+  const falta = mine.filter((f) => f.status === 'falta' || f.status === 'deriva'); const sin = mine.filter((f) => f.status === 'sin');
   const eps = [...new Set(falta.map((f) => f.endpoint || ''))];
   const vs = (f) => (multi ? ` · ${f.variants.join(' ')}` : '');
-  const leg = [['existe', 'existe'], ['falta', 'falta'], ['sin', 'sin origen']].map(([k, t]) => `<span class="${c[k] ? '' : 'zero'}"><i class="d ${CS[k]}"></i><b>${c[k]}</b>${t}</span>`).join('');
+  const leg = [['existe', 'existe'], ['deriva', 'por derivar'], ['falta', 'no existe'], ['sin', 'sin origen']].map(([k, t]) => `<span class="${c[k] ? '' : 'zero'}"><i class="d ${CS[k]}"></i><b>${c[k]}</b>${t}</span>`).join('');
   $('#ctr').classList.toggle('open', state.ctrOpen); $('#ctr').classList.toggle('hot', huecosOn(m) && state.tab !== 'source' && state.tab !== 'text');
-  $('#ctr').innerHTML = `<div class="cbar" role="img" aria-label="${c.existe} existe, ${c.falta} falta, ${c.sin} sin origen">${['existe', 'falta', 'sin'].map((k) => `<i class="${CS[k]}" style="flex-grow:${c[k]}"></i>`).join('')}</div>
+  $('#ctr').innerHTML = `<div class="cbar" role="img" aria-label="${c.existe} existe, ${c.deriva || 0} por derivar, ${c.falta} no existe, ${c.sin} sin origen">${['existe', 'deriva', 'falta', 'sin'].map((k) => `<i class="${CS[k]}" style="flex-grow:${c[k]}"></i>`).join('')}</div>
     <div class="legend">${leg}</div>
     ${eps.length ? `<div class="todo"><div class="todo-h">${icon('plug')}Endpoints por crear<span class="n">${eps.length}</span></div>${eps.map((e) => {
       const fs = falta.filter((f) => (f.endpoint || '') === e);

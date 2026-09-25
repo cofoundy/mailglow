@@ -52,8 +52,8 @@ test('huecos: text, attribute and section fields are outlined with status and so
 
 test('contract report: per-variant counts and the endpoints to build', () => {
   const rep = contractReport(CONTRACT, { a: ['contact.name', 'brief'], b: ['contact.name', 'extra', 'messages[].text'] });
-  assert.deepEqual(rep.perVariant.a, { existe: 1, falta: 1, sin: 0 });
-  assert.deepEqual(rep.perVariant.b, { existe: 2, falta: 0, sin: 1 });
+  assert.deepEqual(rep.perVariant.a, { existe: 1, deriva: 0, falta: 1, sin: 0 });
+  assert.deepEqual(rep.perVariant.b, { existe: 2, deriva: 0, falta: 0, sin: 1 });
   assert.deepEqual(rep.missingEndpoints, ['GET /conversations/{conversation_id}/brief']);
   assert.equal(rep.fields[0].status, 'sin');
 });
@@ -114,4 +114,14 @@ test('mailbox + server: template variants render per case, huecos is a toggle, l
   } finally {
     server.close();
   }
+});
+
+test('deriva: the data exists but must be exposed — its own status, colour and list', () => {
+  const C = { fields: { wait: { status: 'deriva', source: 'conversations.last_customer_message_at', endpoint: 'GET /c/{id}/handoff', path: 'wait' }, brief: { status: 'falta', endpoint: 'GET /c/{id}/brief' } } };
+  const rep = contractReport(C, { a: ['wait', 'brief'] });
+  assert.deepEqual(rep.perVariant.a, { existe: 0, deriva: 1, falta: 1, sin: 0 });
+  assert.deepEqual(rep.toExpose, ['GET /c/{id}/handoff → wait']);
+  assert.deepEqual(rep.missingData, ['brief']);
+  const { html } = renderTemplate('<html><head></head><body><p>{{wait}}</p></body></html>', { wait: '4 min' }, { contract: C, annotate: true });
+  assert.match(html, /class="vf vf-deriva" data-vf-label="deriva · el dato existe \(conversations\.last_customer_message_at\)/);
 });

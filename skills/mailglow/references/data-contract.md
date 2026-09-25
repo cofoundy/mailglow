@@ -40,8 +40,11 @@ Inside a loop the field key is `messages[].text`; the contract can declare it or
 }
 ```
 
-- `status`: `existe` (an endpoint returns it today) · `falta` (name the endpoint to build) · anything
-  else or absent = **sin origen**, which `contract --strict` and `lint` flag.
+- `status`: `existe` (an endpoint returns it today) · `deriva` (the data exists — name it in `source`, e.g.
+  `conversations.last_customer_message_at` — but a rule or an endpoint must expose it) · `falta` (the data does
+  not exist anywhere: name what must be built) · anything else or absent = **sin origen** (`contract --strict`
+  and `lint` flag it). Don't map everything to a future endpoint as `falta`: that hides which data is really
+  missing. Huecos colours: green existe, blue deriva, amber falta, red sin origen.
 - `path`: dots, `[0]`, `[-1]`, slices `[-3:]` into the endpoint's JSON.
 - `sample`: what renders while the endpoint doesn't exist (and for `fetch` fallbacks).
 - Extra keys (`backend`, `note`, `owner`, `issue`) are free-form and shown in the report.
