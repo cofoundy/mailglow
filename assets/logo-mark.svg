@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="mailglow">
+  <defs>
+    <radialGradient id="mg-sun" cx="50%" cy="75%" r="70%">
+      <stop offset="0" stop-color="#FFF1C9"/>
+      <stop offset=".45" stop-color="#FFC56B"/>
+      <stop offset="1" stop-color="#FF8A3D"/>
+    </radialGradient>
+    <radialGradient id="mg-halo" cx="256" cy="262" r="190" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FF9F4A" stop-opacity=".95"/>
+      <stop offset=".55" stop-color="#FF7A3D" stop-opacity=".35"/>
+      <stop offset="1" stop-color="#FF7A3D" stop-opacity="0"/>
+    </radialGradient>
+    <clipPath id="mg-back"><path d="M60 214 L236 112 Q256 100 276 112 L452 214 V410 Q452 440 422 440 H90 Q60 440 60 410 Z"/></clipPath>
+  </defs>
+  <!-- back of the envelope + opened flap -->
+  <path fill="var(--mg-ink, #151B3F)" d="M60 214 L236 112 Q256 100 276 112 L452 214 V410 Q452 440 422 440 H90 Q60 440 60 410 Z"/>
+  <!-- the light inside -->
+  <g clip-path="url(#mg-back)">
+    <circle cx="256" cy="262" r="190" fill="url(#mg-halo)"/>
+    <circle cx="256" cy="262" r="92" fill="url(#mg-sun)"/>
+  </g>
+  <!-- front pocket -->
+  <path fill="var(--mg-ink, #151B3F)" d="M60 226 L244 330 Q256 337 268 330 L452 226 V410 Q452 440 422 440 H90 Q60 440 60 410 Z"/>
+  <!-- the lit seam -->
+  <path d="M66 224 L244 324 Q256 331 268 324 L446 224" fill="none" stroke="#FFD58F" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

@@ -1,0 +1,41 @@
+name: ci
+on:
+  push: { branches: [main] }
+  pull_request:
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: bash scripts/validate-skills.sh
+      - name: lint rules reference is in sync with the engine
+        run: |
+          node skills/mailglow/scripts/mailglow.mjs rules > /tmp/rules.md
+          sed -n '/^| rule |/,$p' skills/mailglow/references/client-compat.md | diff - /tmp/rules.md
+      - name: starter + examples are client-safe
+        run: node skills/mailglow/scripts/mailglow.mjs lint skills/mailglow/examples skills/mailglow/templates/starter.html
+      - name: engine smoke tests (Chrome is preinstalled on ubuntu-latest)
+        run: npm test
+      - name: nothing private in tracked text (the OCR half runs locally, with MAILGLOW_PRIVATE_TERMS)
+        run: bash scripts/check-private.sh
+
+  gallery:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - name: build the landing + template gallery (thumbnails via the preinstalled Chrome)
+        run: node skills/mailglow/scripts/mailglow.mjs gallery --out site
+      - name: every example has a page, and the sitemap lists it
+        run: |
+          for f in skills/mailglow/examples/*.html skills/mailglow/examples/*/; do
+            [ -e "$f" ] || continue
+            slug=$(basename "$f" .html)
+            test -f "site/templates/$slug/index.html" || { echo "no page for $slug"; exit 1; }
+            grep -q "/templates/$slug/</loc>" site/sitemap.xml || { echo "$slug missing from sitemap"; exit 1; }
+          done
+      - uses: actions/upload-artifact@v4
+        with: { name: site, path: site, retention-days: 7 }

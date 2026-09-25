@@ -1,0 +1,25 @@
+{
+  "name": "mailglow",
+  "version": "0.2.0",
+  "description": "mailglow — vibe-code beautiful, responsive HTML emails with your AI agent: a skill plus a zero-dependency local inbox to preview, lint for Gmail/Outlook/Apple Mail, compare variants and screenshot every email.",
+  "author": {
+    "name": "Cofoundy SAC",
+    "url": "https://cofoundy.dev"
+  },
+  "homepage": "https://github.com/cofoundy/mailglow",
+  "repository": "https://github.com/cofoundy/mailglow",
+  "license": "MIT",
+  "keywords": [
+    "email",
+    "html-email",
+    "email-templates",
+    "responsive-email",
+    "email-design",
+    "transactional-email",
+    "email-preview",
+    "dark-mode",
+    "agent-skills",
+    "claude-code",
+    "vibe-coding"
+  ]
+}

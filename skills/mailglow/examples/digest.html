@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="x-apple-disable-message-reformatting">
+<meta name="format-detection" content="telephone=no, date=no, address=no, email=no, url=no">
+<meta name="color-scheme" content="light dark">
+<meta name="supported-color-schemes" content="light dark">
+<meta name="mail:subject" content="Week 38: fewer incidents, slower checkout">
+<meta name="mail:from" content="Tidemark <digest@tidemark.dev>">
+<meta name="mail:preheader" content="Uptime 99.982%, 2 incidents, and p95 on /checkout up 38 ms since Tuesday's deploy.">
+<title>Week 38: fewer incidents, slower checkout</title>
+<!--[if mso]>
+<noscript><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml></noscript>
+<style>table,td,h1,h2,p,a{font-family:Arial,Helvetica,sans-serif!important}</style>
+<![endif]-->
+<style>
+  body{margin:0;padding:0;width:100%!important;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%}
+  a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important}
+  @media (max-width:620px){
+    .container{width:100%!important}
+    .px{padding-left:18px!important;padding-right:18px!important}
+    .h1{font-size:23px!important;line-height:29px!important}
+    .stack{display:block!important;width:100%!important;box-sizing:border-box}
+    .tile{border-right:0!important;border-bottom:1px solid #d4d9df!important}
+    .tile-last{border-bottom:0!important}
+    .hide-m{display:none!important}
+    .meta-m{display:block!important;max-height:none!important;overflow:visible!important}
+    .btn,.btn td{width:100%!important}
+    .btn a{display:block!important;text-align:center!important}
+  }
+  @media (prefers-color-scheme:dark){
+    .bg-page{background-color:#0c0f13!important}
+    .bg-card{background-color:#141920!important}
+    .bg-head{background-color:#1a2029!important}
+    .ink{color:#e7eaee!important}
+    .ink-2{color:#b3bac4!important}
+    .ink-3{color:#858e9a!important}
+    .rule,.tile{border-color:#2a313b!important}
+    .up-good{color:#5fd08a!important}
+    .up-bad{color:#ff8a7a!important}
+    .tag-ok{background-color:#16331f!important;color:#7fdc9f!important}
+    .tag-open{background-color:#3d1c18!important;color:#ff9c8e!important}
+    .tag-dep{background-color:#18284a!important;color:#9dbcff!important}
+    .btn td{background-color:#6b9bff!important}
+    .btn a{color:#0c0f13!important}
+    .link{color:#8fb2ff!important}
+  }
+  [data-ogsc] .ink{color:#e7eaee!important}
+  [data-ogsc] .ink-2{color:#b3bac4!important}
+  [data-ogsc] .ink-3{color:#858e9a!important}
+  [data-ogsc] .link{color:#8fb2ff!important}
+  [data-ogsc] .up-good{color:#5fd08a!important}
+  [data-ogsc] .up-bad{color:#ff8a7a!important}
+  [data-ogsb] .bg-page{background-color:#0c0f13!important}
+  [data-ogsb] .bg-card{background-color:#141920!important}
+  [data-ogsb] .bg-head{background-color:#1a2029!important}
+</style>
+</head>
+<body class="bg-page" style="margin:0;padding:0;background-color:#e9ecef;">
+  <div style="display:none;max-height:0;overflow:hidden;mso-hide:all;font-size:1px;line-height:1px;color:#e9ecef;opacity:0;">
+    Uptime 99.982%, 2 incidents, and p95 on /checkout up 38 ms since Tuesday's deploy.
+    &#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;
+  </div>
+
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" class="bg-page" style="background-color:#e9ecef;">
+    <tr>
+      <td align="center" style="padding:24px 12px 36px;">
+        <!--[if mso]><table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0"><tr><td><![endif]-->
+        <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" class="container bg-card rule" style="width:600px;max-width:600px;background-color:#ffffff;border:1px solid #d4d9df;">
+
+          <!-- Header bar -->
+          <tr>
+            <td class="px bg-head rule" style="padding:12px 24px;background-color:#f4f6f8;border-bottom:1px solid #d4d9df;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td class="ink" style="font-family:'SFMono-Regular',Menlo,Consolas,'Liberation Mono',monospace;font-size:13px;line-height:18px;font-weight:700;color:#11161c;">&#9632;&nbsp;tidemark</td>
+                  <td align="right" class="ink-3" style="font-family:'SFMono-Regular',Menlo,Consolas,'Liberation Mono',monospace;font-size:12px;line-height:18px;color:#5f6874;">acme-prod &middot; W38 &middot; Sep 15&ndash;21</td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Title -->
+          <tr>
+            <td class="px" style="padding:24px 24px 18px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+              <h1 class="h1 ink" style="margin:0 0 8px;font-size:26px;line-height:32px;font-weight:700;letter-spacing:-0.02em;color:#11161c;">Fewer incidents, slower checkout.</h1>
+              <p class="ink-2" style="margin:0;font-size:16px;line-height:24px;color:#454e59;">A quiet week overall. The one thing worth your attention: checkout got slower after Tuesday&rsquo;s deploy and hasn&rsquo;t recovered.</p>
+            </td>
+          </tr>
+
+          <!-- Stat tiles -->
+          <tr>
+            <td class="px" style="padding:0 24px 24px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" class="rule" style="border:1px solid #d4d9df;">
+                <tr>
+                  <td class="stack tile" width="33%" valign="top" style="width:33%;padding:14px 16px;border-right:1px solid #d4d9df;">
+                    <p class="ink-3" style="margin:0 0 6px;font-family:'SFMono-Regular',Menlo,Consolas,'Liberation Mono',monospace;font-size:11px;line-height:14px;letter-spacing:0.08em;text-transform:uppercase;color:#5f6874;">Uptime</p>
+                    <p class="ink" style="margin:0 0 4px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:28px;line-height:32px;font-weight:700;letter-spacing:-0.02em;color:#11161c;">99.982%</p>
+                    <p class="up-good" style="margin:0;font-family:'SFMono-Regular',Menlo,Consolas,'Liberation Mono',monospace;font-size:13px;line-height:18px;color:#16803c;">&#9650; 0.011 pts</p>
+                  </td>
+                  <td class="stack tile" width="34%" valign="top" style="width:34%;padding:14px 16px;border-right:1px solid #d4d9df;">
+                    <p class="ink-3" style="margin:0 0 6px;font-family:'SFMono-Regular',Menlo,Consolas,'Liberation Mono',monospace;font-size:11px;line-height:14px;letter-spacing:0.08em;text-transform:uppercase;color:#5f6874;">p95 /checkout</p>
+                    <p class="ink" style="margin:0 0 4px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:28px;line-height:32px;font-weight:700;letter-spacing:-0.02em;color:#11161c;">412 ms</p>
+                    <p class="up-bad" style="margin:0;font-family:'SFMono-Regular',Menlo,Consolas,'Liberation Mono',monospace;font-size:13px;line-height:18px;color:#c2321f;">&#9650; 38 ms (worse)</p>
+                  </td>
+                  <td class="stack tile tile-last" width="33%" valign="top" style="width:33%;padding:14px 16px;">
+                    <p class="ink-3" style="margin:0 0 6px;font-family:'SFMono-Regular',Menlo,Consolas,'Liberation Mono',monospace;font-size:11px;line-height:14px;letter-spacing:0.08em;text-transform:uppercase;color:#5f6874;">Incidents</p>
+                    <p class="ink" style="margin:0 0 4px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:28px;line-height:32px;font-weight:700;letter-spacing:-0.02em;color:#11161c;">2</p>
+                    <p class="up-good" style="margin:0;font-family:'SFMono-Regular',Menlo,Consolas,'Liberation Mono',monospace;font-size:13px;line-height:18px;color:#16803c;">&#9660; 3 vs last week</p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- List -->
+          <tr>
+            <td class="px" style="padding:0 24px 8px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+              <p class="ink-3" style="margin:0 0 4px;font-family:'SFMono-Regular',Menlo,Consolas,'Liberation Mono',monospace;font-size:11px;line-height:14px;letter-spacing:0.08em;text-transform:uppercase;color:#5f6874;">What happened &middot; 4 events</p>
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td valign="top" width="78" class="rule" style="width:78px;padding:13px 0;border-top:1px solid #d4d9df;">
+                    <span class="tag-open" style="display:inline-block;padding:2px 6px;background-color:#fde8e5;font-family:'SFMono-Regular',Menlo,Consolas,'Liberation Mono',monospace;font-size:11px;line-height:14px;font-weight:700;color:#a3281a;">OPEN</span>
+                  </td>
+                  <td valign="top" class="rule" style="padding:12px 8px 12px 0;border-top:1px solid #d4d9df;">
+                    <p class="ink" style="margin:0;font-size:16px;line-height:22px;font-weight:600;color:#11161c;">/checkout p95 regressed after deploy 4f1c9e2</p>
+                    <p class="ink-3" style="margin:2px 0 0;font-family:'SFMono-Regular',Menlo,Consolas,'Liberation Mono',monospace;font-size:12px;line-height:17px;color:#5f6874;">Tue 16:40 &middot; 374 &rarr; 412 ms &middot; owner: payments</p>
+                  </td>
+                </tr>
+                <tr>
+                  <td valign="top" width="78" class="rule" style="width:78px;padding:13px 0;border-top:1px solid #d4d9df;">
+                    <span class="tag-ok" style="display:inline-block;padding:2px 6px;background-color:#e3f4e8;font-family:'SFMono-Regular',Menlo,Consolas,'Liberation Mono',monospace;font-size:11px;line-height:14px;font-weight:700;color:#146c33;">FIXED</span>
+                  </td>
+                  <td valign="top" class="rule" style="padding:12px 8px 12px 0;border-top:1px solid #d4d9df;">
+                    <p class="ink" style="margin:0;font-size:16px;line-height:22px;font-weight:600;color:#11161c;">Search API returned 503 for EU users</p>
+                    <p class="ink-3" style="margin:2px 0 0;font-family:'SFMono-Regular',Menlo,Consolas,'Liberation Mono',monospace;font-size:12px;line-height:17px;color:#5f6874;">Thu 03:12 &middot; 14 min &middot; cause: node pool autoscale</p>
+                  </td>
+                </tr>
+                <tr>
+                  <td valign="top" width="78" class="rule" style="width:78px;padding:13px 0;border-top:1px solid #d4d9df;">
+                    <span class="tag-ok" style="display:inline-block;padding:2px 6px;background-color:#e3f4e8;font-family:'SFMono-Regular',Menlo,Consolas,'Liberation Mono',monospace;font-size:11px;line-height:14px;font-weight:700;color:#146c33;">FIXED</span>
+                  </td>
+                  <td valign="top" class="rule" style="padding:12px 8px 12px 0;border-top:1px solid #d4d9df;">
+                    <p class="ink" style="margin:0;font-size:16px;line-height:22px;font-weight:600;color:#11161c;">Webhook deliveries delayed</p>
+                    <p class="ink-3" style="margin:2px 0 0;font-family:'SFMono-Regular',Menlo,Consolas,'Liberation Mono',monospace;font-size:12px;line-height:17px;color:#5f6874;">Sat 21:05 &middot; 6 min &middot; queue backlog, drained</p>
+                  </td>
+                </tr>
+                <tr>
+                  <td valign="top" width="78" class="rule" style="width:78px;padding:13px 0;border-top:1px solid #d4d9df;border-bottom:1px solid #d4d9df;">
+                    <span class="tag-dep" style="display:inline-block;padding:2px 6px;background-color:#e6eeff;font-family:'SFMono-Regular',Menlo,Consolas,'Liberation Mono',monospace;font-size:11px;line-height:14px;font-weight:700;color:#1d4fb8;">DEPLOYS</span>
+                  </td>
+                  <td valign="top" class="rule" style="padding:12px 8px 12px 0;border-top:1px solid #d4d9df;border-bottom:1px solid #d4d9df;">
+                    <p class="ink" style="margin:0;font-size:16px;line-height:22px;font-weight:600;color:#11161c;">23 deploys, 1 rolled back</p>
+                    <p class="ink-3" style="margin:2px 0 0;font-family:'SFMono-Regular',Menlo,Consolas,'Liberation Mono',monospace;font-size:12px;line-height:17px;color:#5f6874;">median lead time 41 min &middot; rollback: web@b7d02aa</p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- CTA -->
+          <tr>
+            <td class="px" style="padding:20px 24px 24px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" class="btn">
+                <tr>
+                  <td align="center" bgcolor="#1f5fd6" style="border-radius:4px;background-color:#1f5fd6;">
+                    <a href="https://app.tidemark.dev/acme-prod/reports/2026-w38" target="_blank" style="display:inline-block;padding:12px 20px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:16px;line-height:20px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:4px;">Open the W38 report</a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td class="px ink-3 bg-head rule" style="padding:14px 24px;background-color:#f4f6f8;border-top:1px solid #d4d9df;font-family:'SFMono-Regular',Menlo,Consolas,'Liberation Mono',monospace;font-size:11px;line-height:17px;color:#5f6874;">
+              Sent every Monday to members of acme-prod. <a class="link" href="https://app.tidemark.dev/settings/digest" style="color:#1d4fb8;text-decoration:underline;">Change digest</a><br>
+              Tidemark Systems Ltd &middot; 20 Mortimer St, London W1T 3JW
+            </td>
+          </tr>
+        </table>
+        <!--[if mso]></td></tr></table><![endif]-->
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

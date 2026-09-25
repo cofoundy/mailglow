@@ -1,0 +1,23 @@
+{
+  "name": "mailglow",
+  "owner": {
+    "name": "Cofoundy SAC",
+    "url": "https://cofoundy.dev"
+  },
+  "metadata": {
+    "description": "mailglow — vibe-code beautiful, responsive HTML emails with your AI agent: a skill plus a zero-dependency local inbox to preview, lint for Gmail/Outlook/Apple Mail, compare variants and screenshot every email.",
+    "version": "0.2.0",
+    "repository": "https://github.com/cofoundy/mailglow"
+  },
+  "plugins": [
+    {
+      "name": "mailglow",
+      "description": "One skill + engine for designing HTML emails like screens: a local mini inbox (list + opened message, desktop/mobile, light/dark/forced-dark, images off), a client-compatibility linter (hosted images only, Gmail clipping, Outlook-safe layout), a variant switcher with Pick + notes the agent reads back, and headless-Chrome screenshots of every email. Zero dependencies, Node 22+.",
+      "source": "./",
+      "strict": true,
+      "skills": [
+        "./skills/mailglow"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "name": "mailglow",
+  "version": "0.2.0",
+  "description": "mailglow — vibe-code beautiful, responsive HTML emails with your AI agent: a skill plus a zero-dependency local inbox to preview, lint for Gmail/Outlook/Apple Mail, compare variants and screenshot every email.",
+  "type": "module",
+  "license": "MIT",
+  "private": true,
+  "bin": {
+    "mailglow": "skills/mailglow/scripts/mailglow.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "node --test 'tests/*.test.mjs'",
+    "examples": "node skills/mailglow/scripts/mailglow.mjs serve skills/mailglow/examples --open",
+    "gallery": "node skills/mailglow/scripts/mailglow.mjs gallery --out site",
+    "check-private": "bash scripts/check-private.sh",
+    "validate": "bash scripts/validate-skills.sh",
+    "deploy:site": "bash scripts/deploy-site.sh"
+  },
+  "repository": "github:cofoundy/mailglow",
+  "homepage": "https://mailglow.cofoundy.dev",
+  "keywords": [
+    "email",
+    "html-email",
+    "email-templates",
+    "responsive-email",
+    "email-design",
+    "dark-mode",
+    "agent-skills",
+    "claude-code",
+    "vibe-coding"
+  ]
+}

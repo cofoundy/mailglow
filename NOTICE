@@ -1,0 +1,12 @@
+mailglow
+Copyright (c) 2026 Cofoundy SAC
+
+This repository contains no third-party code.
+
+Conceptual inspiration (no code or data copied):
+- Impeccable (https://impeccable.style, Apache-2.0, Paul Bakaus) — generate variants, compare in place, accept one.
+- prototype skill in mattpocock/skills (https://github.com/mattpocock/skills) — ?variant= switcher with a floating bar.
+- caniemail.com (https://www.caniemail.com, data MIT, Rémi Parmentier) — the client-support facts the lint rules summarise.
+- Mailpit (https://github.com/axllent/mailpit, MIT) — the inbox-shaped preview.
+
+If a future version vendors caniemail data, reproduce its MIT notice here, mapped to the paths taken.
