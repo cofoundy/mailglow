@@ -28,9 +28,9 @@ email still says what it must.
 
 ## Copy
 - **System voice** in the headline ("Requiere humano", "Nota de la IA", "Escalo…"). The reader thinks in the
-  customer's words: "Melissa dice que ya pagó S/345".
+  customer's words: "Ana dice que ya pagó S/120".
 - **The same slogan cadence in every email** ("X te espera." with a punchy period).
-- **Headline = event** ("someone waits") instead of **headline = the ask/outcome** ("Revisa el pago de Melissa").
+- **Headline = event** ("someone waits") instead of **headline = the ask/outcome** ("Revisa el pago de Ana").
 
 ## What authored looks like instead
 - The headline is the reader's next action or the customer's ask, in their words.
