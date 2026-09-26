@@ -4,6 +4,24 @@ All notable changes to mailglow. Format: [Keep a Changelog](https://keepachangel
 
 ## [Unreleased]
 
+### Added
+- **Round 0 — a target image before any HTML** (SKILL.md): brainstorm full mockups with an image model, pick a
+  target, replicate it in layers; keep its shapes by editing the image, never by redrawing them.
+- `references/art-direction.md`: the hero band (art + flat colour, text only on the flat colour), textless art
+  for every language, live script accents with a system-font fallback chain, images-off and dark variants.
+- Contract fields accept `"required": true` to skip the `missing`/`empty` stress shapes.
+
+### Changed
+- Design quality gates: the critique scores **beauty against the target** as well as usability; the anti-slop
+  list is a filter against generic details, not a style (`anti-slop.md` §What this list is not).
+
+### Fixed
+- `contract` printed «undefined» for `deriva` fields and left them out of the per-variant counts.
+- `snap --dark` rendered light on mailglow pages (`/raw` defaulted to `scheme=light`).
+- `stress-html` raised a false «empty brackets» on list fields (`[]` in the probe value).
+- `lint --net` checked `@font-face` URLs as images.
+- `/raw/<slug>/<variant>` rejected nested slugs unless the slash was encoded.
+
 ## [0.2.0] — 2026-09-24
 
 ### Added

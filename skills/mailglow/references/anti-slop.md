@@ -32,6 +32,13 @@ email still says what it must.
 - **The same slogan cadence in every email** ("X te espera." with a punchy period).
 - **Headline = event** ("someone waits") instead of **headline = the ask/outcome** ("Revisa el pago de Ana").
 
+## What this list is not
+
+A filter against *generic, unearned* details — not a style guide. Stripping every item produced emails that were
+tic-free and still "plain"; a target image that used an eyebrow, icon tiles, a tinted card and an arrow in the
+button, each executed with care, was the one the user loved. Keep a detail when it is executed like the target;
+cut it when it's filler. Richness comes from art and layers (`art-direction.md`), not from removing things.
+
 ## What authored looks like instead
 - The headline is the reader's next action or the customer's ask, in their words.
 - The layout borrows from an artefact in the reader's world (a kitchen ticket, the WhatsApp chat itself, a

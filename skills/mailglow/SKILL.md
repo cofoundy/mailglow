@@ -93,6 +93,20 @@ intercepts the send seam, and writes `<slug>.html` + `manifest.json` (subject, f
 Then: `$VE lint <dir>` → `$VE shoot <dir>` → **open the screenshots yourself** → `serve` for the user.
 Report per email: what it is, when it fires, its lint errors, and what looks wrong in dark/mobile.
 
+### Round 0 — a target image before any HTML
+
+Typography-only rounds top out at "correct but plain". Rounds of images are cheap; rounds of HTML are not.
+
+1. **Brainstorm with an image model**: 5–8 full mockups of the email, each anchored on a different world (same
+   rule as below), with the brand's real logo/colours passed as reference images (`image-gen` or equivalent).
+   A reference the user already made wins over yours — start from it.
+2. The user picks (or mixes: "the hero of 2 with the list of 5"). That picture is the **target**: the HTML's job
+   is to replicate it detail by detail, in layers — `references/art-direction.md`.
+3. **Keep the target's shapes by editing it, never by guessing them.** Curves, folds and layered panels come from
+   an image edit of the target (remove the text/logo, swap the subject), not from shapes redrawn in code.
+4. **Art carries no words** (one asset for every language); script accents are live text. Text never sits on a
+   photo — only on the flat colour the art hands off to.
+
 ### Design quality gates (every round, before the user sees anything)
 
 - **Directions are worlds, not paints.** Round-1 variants must differ in STRUCTURE (information order, the one
@@ -100,13 +114,14 @@ Report per email: what it is, when it fires, its lint errors, and what looks wro
   (a kitchen ticket, the chat itself, a bank alert). Judge a direction as a SYSTEM: the same direction applied to
   2–3 emails of different urgency (alert, digest, transactional).
 - **The headline is the ask or the outcome**, in the customer's/reader's words — never the system event.
-- **Anti-slop pass**: strip every tell in `references/anti-slop.md` (eyebrows, "·" chains, "→", emoji icons,
-  pills, key/value rows, card-in-card, side-stripes, identical rows).
-- **Fresh critique before presenting**: a reviewer that did not design it scores the round (with the
-  Impeccable plugin: `/impeccable critique`; otherwise a fresh subagent with the anti-slop list + heuristics).
-  Fix P0/P1 first. Show the score with the work.
+- **Anti-slop pass**: strip the *generic* tells in `references/anti-slop.md`. It is a filter, not a style: a
+  detail executed as in the target (an eyebrow, an icon tile, a tinted card) stays; an unearned one goes.
+- **Fresh critique on two axes** before presenting: a reviewer that did not design it scores usability (with
+  the Impeccable plugin: `/impeccable critique`) **and beauty /10 against the target image** — "what detail of
+  the target is missing". Usability scores don't see "ugly". Fix P0/P1 first. Show both scores with the work.
 - **Huecos in every round**: `$VE contract <slug>` per variant — existe / **deriva** (data exists, needs a rule or
   endpoint) / falta (data doesn't exist) / sin origen — and say what each design would cost to build.
+- **Say what images cost as a measurement or as an estimate** — never an estimate stated as the bill.
 
 ### C. Iterate (the loop)
 
@@ -175,6 +190,7 @@ Before saying anything looks good, open the PNGs — a screenshot is not evidenc
 
 ## References
 
+- `references/art-direction.md` — round 0 with an image model, replicating a target in layers, the hero band (art + flat colour), textless art, live script accents, fallbacks.
 - `references/design-principles.md` — hierarchy, type, colour, dark mode, copy; the email anti-slop list.
 - `references/components.md` — copy-paste blocks: button (+VML), stat tiles, key/value rows, list rows, 2-col stack, divider, footer, hosted image.
 - `references/client-compat.md` — every lint rule, why it exists, which clients it protects.
