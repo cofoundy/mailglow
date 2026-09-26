@@ -142,3 +142,21 @@ test('writeStressCases + checkStress on a folder: files replaced, real cases unt
   assert.ok(rep.some((r) => r.variant === 'a' && r.case === 'stress-missing'));
   assert.ok(!rep.some((r) => r.variant === 'b' && r.findings.some((f) => f.rule === 'stress-empty-join')), JSON.stringify(rep.filter((r) => r.variant === 'b')));
 });
+
+test('stress-html: the value names the field without "[]", so it never reads as empty brackets', () => {
+  const html = cases()['stress-html'];
+  assert.ok(html.messages.every((m) => !m.author.includes('[]') && !m.content.includes('[]')), JSON.stringify(html.messages));
+  assert.match(html.messages[0].author, /<i>messages\.author<\/i>/);
+  assert.deepEqual(findingsFor(SAFE, html).filter((f) => f.rule === 'stress-empty-join'), []);
+});
+
+test('required: true keeps a field out of missing/empty, and only those shapes', () => {
+  const C = { fields: { ...CONTRACT.fields, 'contact.name': { ...CONTRACT.fields['contact.name'], required: true } } };
+  const c = Object.fromEntries(buildStressCases(C, BASE, { baseName: 'demo' }).map((x) => [x.name, x.data]));
+  assert.equal(c['stress-missing'].contact.name, 'Ana Torres');
+  assert.equal(c['stress-empty'].contact.name, 'Ana Torres');
+  assert.ok(!c['stress-missing']._meta.fields.includes('contact.name'));
+  assert.equal(c['stress-missing'].motivo, null, 'fields not marked required still go missing');
+  assert.equal(c['stress-name-emoji'].contact.name, '🌼🌼🌼');
+  assert.equal(c['stress-html'].contact.name.includes('<b>'), true);
+});

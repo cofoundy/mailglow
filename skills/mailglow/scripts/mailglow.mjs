@@ -169,12 +169,12 @@ function runContract() {
   const { full, msg } = messageAt(pos[0] || '');
   if (!msg.template) { console.log(`${msg.slug} has no {{fields}} — nothing to map yet.`); return 0; }
   const rep = contractFor(msg);
-  const icon = { existe: '✓', falta: '✗', sin: '?' };
+  const icon = { existe: '✓', deriva: '~', falta: '✗', sin: '?' };
   if (flags.json) console.log(JSON.stringify(rep, null, 2));
   else {
     console.log(`\n${msg.slug} — ${rep.fields.length} fields · cases: ${msg.cases.join(', ') || '(samples only)'}${readContract(full) ? '' : ' · NO contract.json'}\n`);
     for (const f of rep.fields) console.log(`  ${icon[f.status]} ${f.status.padEnd(6)} ${f.field.padEnd(26)} ${f.endpoint || '—'}${f.path ? ` → ${f.path}` : ''}   [${f.variants.join(',')}]${f.note ? `\n             ${f.note}` : ''}`);
-    console.log('\n  per variant: ' + Object.entries(rep.perVariant).map(([v, c]) => `${v} ${c.existe}✓ ${c.falta}✗ ${c.sin}?`).join(' · '));
+    console.log('\n  per variant: ' + Object.entries(rep.perVariant).map(([v, c]) => `${v} ${c.existe}✓ ${c.deriva}~ ${c.falta}✗ ${c.sin}?`).join(' · '));
     if (rep.missingEndpoints.length) console.log('  endpoints to build:\n' + rep.missingEndpoints.map((e) => `    - ${e}`).join('\n'));
   }
   return flags.strict && rep.fields.some((f) => f.status === 'sin') ? 1 : 0;

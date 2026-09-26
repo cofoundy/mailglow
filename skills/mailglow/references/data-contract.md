@@ -70,7 +70,7 @@ drawn on. Why this matters and how to pick the base: `real-data-first.md`.
 
 | shape | applies to | value |
 |---|---|---|
-| `missing` · `empty` | every field | `null` · `""` / `[]` / `0` |
+| `missing` · `empty` | every field except `"required": true` | `null` · `""` / `[]` / `0` |
 | `no-phone` | phone | `null` |
 | `name-emoji` · `name-fancy` · `name-placeholder` · `caps` | name (+ list item names) | `🌼🌼🌼` · `𝓜𝓪𝓻𝓲𝓪 ✨ …` · `WhatsApp User` · UPPERCASE |
 | `short` · `long` · `long-token` | text / longtext (last list item for `short`) | `ok` · 620+ chars · 620 chars, no spaces |
@@ -83,13 +83,17 @@ Per field in `contract.json`:
 
 ```json
 "contact.name": { "status": "existe", "kind": "name", "stress": ["🌼🌼🌼", "WhatsApp User"] },
-"internal_ref": { "status": "existe", "stress": false }
+"internal_ref": { "status": "existe", "stress": false },
+"conversation.id": { "status": "existe", "required": true }
 ```
 
 - `kind`: `name` · `text` · `longtext` · `phone` · `url` · `list` · `number` · `date` · `id` — inferred
   from the key and the sample when absent (`*name*`/`author` → name, `motivo`/`content`/`note` or >120
   chars → longtext, `*_id` → id, arrays → list…). The command prints every field's kind: fix the wrong ones.
 - `stress`: extra values replayed as their own cases; `false` excludes the field.
+- `required: true`: the backend guarantees the field (a primary key, a value the sender checks before
+  sending), so the `missing` and `empty` shapes leave it alone. Every other shape still applies. Use it
+  only for what the backend enforces; a field that is merely "always there so far" belongs in the stress cases.
 - Item fields of a list come from `messages[].content`-style keys or the first item's keys.
 
 Every stress case carries `_meta: { stress: true, shape, base, note, fields }` so the inbox can group

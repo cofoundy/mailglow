@@ -14,6 +14,7 @@
 //
 // A field's kind decides which shapes apply. Declare it in the contract or let it be inferred:
 //   "contact.name": { …, "kind": "name", "stress": ["🌼🌼🌼", "Kapso User"] }     ("stress": false = skip)
+//   "conversation.id": { …, "required": true }   (the backend guarantees it: no missing/empty shapes)
 // kinds: name · text · longtext · phone · url · list · number · date · id (id/bool only go missing/empty)
 import fs from 'node:fs';
 import path from 'node:path';
@@ -61,7 +62,7 @@ export function collectFields(contract, base) {
     if (d.stress === false) continue;
     const sample = getPath(base, key) ?? d.sample;
     const kind = KINDS.includes(d.kind) ? d.kind : inferKind(key, sample);
-    const f = { key, kind, sample, custom: Array.isArray(d.stress) ? d.stress : [] };
+    const f = { key, kind, sample, required: d.required === true, custom: Array.isArray(d.stress) ? d.stress : [] };
     if (kind === 'list') {
       const first = Array.isArray(sample) ? sample.find((x) => x != null) : undefined;
       const itemKeys = new Set(Object.keys(decl).filter((k) => k.startsWith(`${key}[].`)).map((k) => k.slice(key.length + 3)));
@@ -114,8 +115,8 @@ const upper = (v, fallback) => (typeof v === 'string' && v.trim() ? v.toUpperCas
 
 // shape → (field) => new value, or undefined to leave the field alone.
 const SHAPES = {
-  missing: { note: 'every field absent (null)', f: (f) => (f.kind === 'bool' ? undefined : null) },
-  empty: { note: 'every field present but empty ("" / [])', f: (f) => (f.kind === 'list' ? [] : f.kind === 'number' ? 0 : STRINGY.has(f.kind) ? '' : undefined) },
+  missing: { absent: true, note: 'every field absent (null)', f: (f) => (f.kind === 'bool' ? undefined : null) },
+  empty: { absent: true, note: 'every field present but empty ("" / [])', f: (f) => (f.kind === 'list' ? [] : f.kind === 'number' ? 0 : STRINGY.has(f.kind) ? '' : undefined) },
   'no-phone': { note: 'no phone (identity by username/BSUID only)', f: (f) => (f.kind === 'phone' ? null : undefined) },
   'name-emoji': { note: 'names that are only emoji', f: (f) => (f.kind === 'name' ? V.emoji : undefined), item: (ik) => (ik.kind === 'name' ? V.emoji : undefined) },
   'name-fancy': { note: 'names in "fancy" Unicode (math script/fraktur) + sparkles', f: (f) => (f.kind === 'name' ? V.fancy : undefined), item: (ik) => (ik.kind === 'name' ? V.fancy : undefined) },
@@ -124,7 +125,7 @@ const SHAPES = {
   short: { note: 'text fields that say almost nothing ("ok")', f: (f) => (PROSE.has(f.kind) ? V.short : undefined), item: (ik) => (PROSE.has(ik.kind) ? V.short : undefined), last: true },
   long: { note: 'very long values (names ~120, short text ~80, long text 620+ chars)', f: (f) => (f.kind === 'name' ? longProse(f.sample, 120) : f.kind === 'longtext' ? longProse(f.sample) : f.kind === 'text' ? longProse(f.sample, 80) : undefined), item: (ik) => (PROSE.has(ik.kind) ? longProse('', 620) : undefined) },
   'long-token': { note: '600+ chars without a single space (URLs, pasted tokens)', f: (f) => (PROSE.has(f.kind) || f.kind === 'url' ? longToken(f.kind) : undefined), item: (ik) => (PROSE.has(ik.kind) ? longToken(ik.kind) : undefined) },
-  html: { note: 'values that look like HTML — must render as text', f: (f) => (STRINGY.has(f.kind) ? V.html(f.key) : undefined), item: (ik, f) => (STRINGY.has(ik.kind) ? V.html(`${f.key}[].${ik.key}`) : undefined) },
+  html: { note: 'values that look like HTML — must render as text', f: (f) => (STRINGY.has(f.kind) ? V.html(f.key) : undefined), item: (ik, f) => (STRINGY.has(ik.kind) ? V.html(`${f.key}.${ik.key}`) : undefined) },
   'list-0': { note: 'every list empty', f: (f) => (f.kind === 'list' ? [] : undefined) },
   'list-1': { note: 'every list with a single item', f: (f) => (f.kind === 'list' ? listOf(f, 1) : undefined) },
   'list-many': { note: 'every list with 12 items (a burst of messages)', f: (f) => (f.kind === 'list' ? listOf(f, 12) : undefined) },
@@ -165,6 +166,7 @@ export function buildStressCases(contract, base, { baseName = null } = {}) {
     const data = clone(clean);
     const changed = [];
     for (const f of fields) {
+      if (f.required && def.absent) continue;
       let v = def.f(f);
       if (v === undefined && def.item && f.kind === 'list' && Array.isArray(f.sample) && f.sample.length) {
         const items = listOf(f, null);

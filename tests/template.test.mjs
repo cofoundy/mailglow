@@ -2,6 +2,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import { execFileSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 import http from 'node:http';
 import os from 'node:os';
 import path from 'node:path';
@@ -124,4 +126,44 @@ test('deriva: the data exists but must be exposed — its own status, colour and
   assert.deepEqual(rep.missingData, ['brief']);
   const { html } = renderTemplate('<html><head></head><body><p>{{wait}}</p></body></html>', { wait: '4 min' }, { contract: C, annotate: true });
   assert.match(html, /class="vf vf-deriva" data-vf-label="deriva · el dato existe \(conversations\.last_customer_message_at\)/);
+});
+
+const CLI = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'skills', 'mailglow', 'scripts', 'mailglow.mjs');
+
+test('contract CLI: deriva has its icon and its count per variant', () => {
+  const d = fs.mkdtempSync(path.join(os.tmpdir(), 'mailglow-tpl-'));
+  const msg = path.join(d, 'handoff');
+  fs.mkdirSync(msg);
+  fs.writeFileSync(path.join(msg, 'a.html'), '<html><head></head><body><p>{{wait}} · {{brief}} · {{name}}</p></body></html>');
+  fs.writeFileSync(path.join(msg, 'contract.json'), JSON.stringify({ fields: {
+    wait: { status: 'deriva', source: 'conversations.last_customer_message_at', endpoint: 'GET /c/{id}/handoff', sample: '4 min' },
+    brief: { status: 'falta', endpoint: 'GET /c/{id}/brief', sample: 'Mesa para 12' },
+    name: { status: 'existe', endpoint: 'GET /c/{id}', sample: 'Lucía' },
+  } }));
+  const out = execFileSync(process.execPath, [CLI, 'contract', msg], { encoding: 'utf8' });
+  assert.doesNotMatch(out, /undefined/);
+  assert.match(out, /~ deriva\s+wait/);
+  assert.match(out, /per variant: a 1✓ 1~ 1✗ 0\?/);
+});
+
+test('server: nested slugs (group/case) work without encoding the slash', async () => {
+  const d = fs.mkdtempSync(path.join(os.tmpdir(), 'mailglow-tpl-'));
+  const msg = path.join(d, 'redesign', 'handoff');
+  fs.mkdirSync(msg, { recursive: true });
+  fs.writeFileSync(path.join(msg, 'a.html'), TPL);
+  fs.writeFileSync(path.join(msg, 'b.html'), TPL.replace('Hola,', 'Buenas,'));
+  fs.writeFileSync(path.join(msg, 'contract.json'), JSON.stringify(CONTRACT));
+  const { server, url } = await startServer({ dir: d, port: 0, watch: false });
+  try {
+    assert.equal(loadMailbox(d).messages[0].slug, 'redesign/handoff');
+    const plain = await fetch(`${url}/raw/redesign/handoff/b`);
+    assert.equal(plain.status, 200);
+    assert.match(await plain.text(), /Buenas,/);
+    assert.match(await fetch(`${url}/raw/redesign%2Fhandoff/b`).then((r) => r.text()), /Buenas,/);
+    assert.equal((await fetch(`${url}/api/lint/redesign/handoff/a`)).status, 200);
+    assert.match(await fetch(`${url}/api/text/redesign/handoff/b`).then((r) => r.text()), /Buenas,/);
+    assert.deepEqual((await fetch(`${url}/api/contract/redesign/handoff`).then((r) => r.json())).cases, []);
+  } finally {
+    server.close();
+  }
 });

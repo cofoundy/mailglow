@@ -190,10 +190,13 @@ function checkCss(css, at, add, inline) {
 }
 
 // Optional network pass: every https image must actually answer 2xx with an image content-type.
+// Images only: <img src>, the background attribute and CSS background/background-image — never a
+// @font-face src, which answers font/woff2.
 export async function checkRemoteAssets(html, { timeoutMs = 6000 } = {}) {
   const urls = new Set();
   for (const m of html.matchAll(/<img[^>]+src=["']([^"']+)["']/gi)) urls.add(m[1]);
-  for (const m of html.matchAll(/url\(\s*['"]?(https:[^'")]+)['"]?\s*\)/gi)) urls.add(m[1]);
+  for (const m of html.matchAll(/\sbackground=["']([^"']+)["']/gi)) urls.add(m[1]);
+  for (const m of html.matchAll(/background(?:-image)?\s*:[^;{}]*?url\(\s*['"]?(https:[^'")]+)['"]?\s*\)/gi)) urls.add(m[1]);
   const findings = [];
   await Promise.all(
     [...urls].filter((u) => classifyUrl(u) === 'https').map(async (u) => {

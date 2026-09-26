@@ -178,13 +178,25 @@ ${Object.values(groups).map((g) => `<h2>${esc(g[0].subject)} <span class="s">${e
 }
 
 // Screenshot any URL (e.g. the inbox with ?huecos=1) — same headless Chrome, waits for body[data-ready="1"].
+// `dark` emulates prefers-color-scheme like `shoot`, and for mailglow's own pages (/raw/… and the inbox
+// on localhost) it also asks for ?scheme=dark: the server rewrites the media query per scheme, so
+// without it the email is pinned light whatever the browser prefers.
 export async function snap(url, file, { width = 1440, height = 900, full = false, dark = false } = {}) {
   const { cdp, close } = await launch();
   try {
     const page = await newPage(cdp);
-    const size = await page.goto(url, { width, height, full, dark });
+    const size = await page.goto(dark ? withDarkScheme(url) : url, { width, height, full, dark });
     return await page.shot(file, size);
   } finally {
     await close();
   }
+}
+
+export function withDarkScheme(url) {
+  let u;
+  try { u = new URL(url); } catch { return url; }
+  const ours = u.pathname.startsWith('/raw/') || ['127.0.0.1', 'localhost', '[::1]'].includes(u.hostname);
+  if (!/^https?:$/.test(u.protocol) || !ours || u.searchParams.has('scheme')) return url;
+  u.searchParams.set('scheme', 'dark');
+  return u.href;
 }

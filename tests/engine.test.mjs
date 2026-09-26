@@ -4,12 +4,13 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import zlib from 'node:zlib';
 import { fileURLToPath } from 'node:url';
-import { lint, summarize, classifyUrl } from '../skills/mailglow/scripts/lib/lint.mjs';
+import { lint, summarize, classifyUrl, checkRemoteAssets } from '../skills/mailglow/scripts/lib/lint.mjs';
 import { loadMailbox, readPicks } from '../skills/mailglow/scripts/lib/mailbox.mjs';
 import { renderForClient } from '../skills/mailglow/scripts/lib/render.mjs';
 import { startServer } from '../skills/mailglow/scripts/lib/server.mjs';
-import { shoot, findChrome } from '../skills/mailglow/scripts/lib/shoot.mjs';
+import { shoot, snap, withDarkScheme, findChrome } from '../skills/mailglow/scripts/lib/shoot.mjs';
 
 const SKILL = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'skills', 'mailglow');
 const starter = fs.readFileSync(path.join(SKILL, 'templates', 'starter.html'), 'utf8');
@@ -118,4 +119,55 @@ test('shoot: real PNGs from headless Chrome', { skip: !findChrome() && 'no Chrom
     assert.ok(png.length > 5000, `${s.file} is ${png.length} bytes`);
   }
   assert.ok(fs.existsSync(path.join(out, 'index.html')));
+});
+
+test('lint --net checks images and backgrounds, never a @font-face src', async (t) => {
+  const asked = [];
+  t.mock.method(globalThis, 'fetch', async (u) => {
+    asked.push(u);
+    return new Response('x', { headers: { 'content-type': u.endsWith('.woff2') ? 'font/woff2' : 'image/png' } });
+  });
+  const html = `<style>@font-face{font-family:X;src:url(https://cdn.example.com/x.woff2) format('woff2')}
+    .hero{background-image:url('https://cdn.example.com/bg.png')}</style>
+    <td background="https://cdn.example.com/td.png" style="background:#000 url(https://cdn.example.com/inline.png)">
+    <img src="https://cdn.example.com/logo.png" alt="" width="1">`;
+  const findings = await checkRemoteAssets(html);
+  assert.deepEqual(findings, []);
+  assert.deepEqual(asked.sort(), ['https://cdn.example.com/bg.png', 'https://cdn.example.com/inline.png', 'https://cdn.example.com/logo.png', 'https://cdn.example.com/td.png']);
+});
+
+// First pixel of a PNG written by Chrome (8-bit RGB, no alpha: on the first row every filter leaves it raw).
+function firstPixel(file) {
+  const b = fs.readFileSync(file);
+  const idat = [];
+  for (let i = 8; i < b.length; ) {
+    const len = b.readUInt32BE(i);
+    if (b.toString('ascii', i + 4, i + 8) === 'IDAT') idat.push(b.subarray(i + 8, i + 8 + len));
+    i += 12 + len;
+  }
+  return [...zlib.inflateSync(Buffer.concat(idat)).subarray(1, 4)];
+}
+
+test('snap --dark: same dark as shoot --schemes dark on mailglow pages; other URLs untouched', () => {
+  assert.equal(withDarkScheme('http://127.0.0.1:4555/raw/a/b'), 'http://127.0.0.1:4555/raw/a/b?scheme=dark');
+  assert.equal(withDarkScheme('http://127.0.0.1:4555/?m=a&v=b'), 'http://127.0.0.1:4555/?m=a&v=b&scheme=dark');
+  assert.equal(withDarkScheme('http://127.0.0.1:4555/raw/a/b?scheme=forced'), 'http://127.0.0.1:4555/raw/a/b?scheme=forced');
+  assert.equal(withDarkScheme('https://example.com/pricing'), 'https://example.com/pricing');
+  assert.equal(withDarkScheme('file:///tmp/x.html'), 'file:///tmp/x.html');
+});
+
+test('snap --dark renders a /raw email dark, like shoot', { skip: !findChrome() && 'no Chrome/Chromium on this machine' }, async () => {
+  const d = tmp();
+  fs.writeFileSync(path.join(d, 'hello.html'), '<!doctype html><html><head><style>body{margin:0;height:400px;background:#fff}@media (prefers-color-scheme: dark){body{background:#000}}</style></head><body></body></html>');
+  const { server, url } = await startServer({ dir: d, port: 0, watch: false });
+  try {
+    const dark = path.join(d, 'dark.png');
+    const light = path.join(d, 'light.png');
+    await snap(`${url}/raw/hello/default`, dark, { width: 200, height: 200, dark: true });
+    await snap(`${url}/raw/hello/default`, light, { width: 200, height: 200 });
+    assert.deepEqual(firstPixel(dark), [0, 0, 0]);
+    assert.deepEqual(firstPixel(light), [255, 255, 255]);
+  } finally {
+    server.close();
+  }
 });

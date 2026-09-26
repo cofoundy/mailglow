@@ -45,7 +45,7 @@ export function startServer({ dir, port = 4555, host = '127.0.0.1', watch = true
         return send(200, { root: shown, messages, picks: box.picks });
       }
 
-      let m = url.pathname.match(/^\/raw\/([^/]+)\/([^/]+)$/);
+      let m = url.pathname.match(/^\/raw\/(.+)\/([^/]+)$/);
       if (m) {
         const hit = findVariant(decodeURIComponent(m[1]), decodeURIComponent(m[2]));
         if (!hit) return send(404, 'not found', 'text/plain');
@@ -54,7 +54,7 @@ export function startServer({ dir, port = 4555, host = '127.0.0.1', watch = true
         return send(200, out, 'text/html; charset=utf-8');
       }
 
-      m = url.pathname.match(/^\/api\/(lint|source|text)\/([^/]+)\/([^/]+)$/);
+      m = url.pathname.match(/^\/api\/(lint|source|text)\/(.+)\/([^/]+)$/);
       if (m) {
         const hit = findVariant(decodeURIComponent(m[2]), decodeURIComponent(m[3]));
         if (!hit) return send(404, { error: 'not found' });
@@ -67,7 +67,7 @@ export function startServer({ dir, port = 4555, host = '127.0.0.1', watch = true
         return send(200, { findings, summary: summarize(findings) });
       }
 
-      m = url.pathname.match(/^\/api\/contract\/([^/]+)$/);
+      m = url.pathname.match(/^\/api\/contract\/(.+)$/);
       if (m) {
         const hit = findVariant(decodeURIComponent(m[1]), '');
         if (!hit) return send(404, { error: 'not found' });
